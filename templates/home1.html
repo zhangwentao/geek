@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		
+		<title>geekTopic</title>
+		<meta charset="UTF-8"/>
+	<!--	<meta name="viewport" content="width=device-width user-scalable=no"/>-->
+		<style type="text/css">
+			body{
+				background-image:url('/site_media/yun_logo.jpg');
+				background-color:#000000;
+				background-repeat:no-repeat;
+				background-position:top center;
+			}
+		</style>
+		<script type="text/javascript">
+			var url = "/geek/showmytopic";
+			function handleSaveBtnClick()
+			{
+				var submitBtn = document.getElementById("submit");
+				var req = new XMLHttpRequest();
+				req.onreadystatechange = handleReqStateChanged;
+				req.open("post",url)
+				var data = "";
+				var key = document.getElementsByName("csrfmiddlewaretoken")[0];
+				var vars = collectVars();
+				if(vars == null)
+				{
+					alert("姓名和主题字数是0到10个");
+					return;
+				}
+				data+="csrfmiddlewaretoken="+key.value;
+                                data+="&"+vars;
+				submitBtn.value ="saving...";
+				submitBtn.disabled=true;
+				req.send(data);
+				
+				function handleReqStateChanged()
+				{
+					if(req.readyState == XMLHttpRequest.DONE)
+					{
+						showResult(req.responseText);
+					}
+				}
+				
+				function showResult(resultString)
+				{
+					switch(resultString)
+					{
+						case 'ok':
+							alert("data is saved");
+							submitBtn.value ="save";
+							submitBtn.disabled=false;
+						break;	
+					}	
+				}
+			}
+		
+		  	function collectVars()
+			{
+				var vars = {};
+				vars["topic"] = document.getElementsByName("topic")[0].value;
+				vars["name"] = document.getElementsByName("name")[0].value;
+
+				if(!validate())
+				{
+					return;
+				}
+				return "topic="+vars["topic"]+"&name="+vars["name"]; 
+
+				function validate()
+				{
+					return nameTest(vars["name"]) && topicTest(vars["topic"])
+				}
+				function nameTest(str)
+				{
+					if(str.length > 0 && str.length < 10)
+					{
+					  return true
+					}
+					else 
+					{
+					  return false;
+					}
+				}
+
+				function topicTest(str)
+				{
+					if(str.length > 0 && str.length < 10)
+					{
+					  return true
+					}
+					else 
+					{
+					  return false;
+					}
+ 				}
+			}							
+			
+			function init()
+			{
+				
+			}
+		</script>
+	</head>
+			
+	<body onload="init()">
+		<div align="center" tyle="top:240px;">
+		<!--<div> -->
+			<form id="recordForm">
+				{% csrf_token %}	
+				<span style="color: #ffffff;">好奇:</span><input type="text" name="topic"/><br/>
+				<span style="color: #ffffff;">贵姓:</span><input type="text" name="name"/><br/>
+				<input type="button" id="submit" value="走起" onclick="handleSaveBtnClick()"/>
+			</form>
+		</div>
+	</body>
+</html>
